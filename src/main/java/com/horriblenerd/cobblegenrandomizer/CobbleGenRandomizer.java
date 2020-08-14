@@ -14,7 +14,10 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,21 +33,38 @@ public class CobbleGenRandomizer {
     ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
 
     public CobbleGenRandomizer() {
-        // Register ourselves for server and other game events we are interested in
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
+
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     private Block getLoot(ServerWorld world, ResourceLocation table) {
-        LootTable loottable = world.getServer().getLootTableManager().getLootTableFromLocation(table);
-        LootContext.Builder lootcontext$builder = (new LootContext.Builder(world));
-        List<ItemStack> list = loottable.generate(lootcontext$builder.build(LootParameterSets.EMPTY));
-
         Block block = Blocks.AIR;
-        if (!list.isEmpty()) {
-            ItemStack loot = list.get(world.rand.nextInt(list.size()));
-            Item item = loot.getItem();
-            if (item instanceof BlockItem) {
-                block = ((BlockItem) item).getBlock();
+        if (Config.USE_CONFIG.get()) {
+            List<? extends String> list = null;
+            if (table == COBBLE)
+                list = Config.BLOCK_LIST_COBBLE.get();
+            else if (table == STONE)
+                list = Config.BLOCK_LIST_STONE.get();
+            else if (table == BASALT)
+                list = Config.BLOCK_LIST_BASALT.get();
+
+            if (list != null && !list.isEmpty()) {
+                String loot = list.get(world.rand.nextInt(list.size()));
+
+                block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(loot));
+            }
+
+        } else {
+            LootTable loottable = world.getServer().getLootTableManager().getLootTableFromLocation(table);
+            LootContext.Builder lootcontext$builder = (new LootContext.Builder(world));
+            List<ItemStack> list = loottable.generate(lootcontext$builder.build(LootParameterSets.EMPTY));
+            if (!list.isEmpty()) {
+                ItemStack loot = list.get(world.rand.nextInt(list.size()));
+                Item item = loot.getItem();
+                if (item instanceof BlockItem) {
+                    block = ((BlockItem) item).getBlock();
+                }
             }
         }
         return block;
@@ -63,7 +83,8 @@ public class CobbleGenRandomizer {
             else if (event.getNewState().getBlock() == Blocks.field_235337_cO_)
                 block = getLoot(world, BASALT);
 
-            if (block != Blocks.AIR) event.setNewState(block.getDefaultState());
+            if (block != Blocks.AIR)
+                event.setNewState(block.getDefaultState());
         }
     }
 }
