@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:basalt",
+          "weight": 60
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:netherrack",
+          "weight": 60
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:blackstone",
+          "weight": 60
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:nether_gold_ore",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:nether_quartz_ore",
+          "weight": 30
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:ancient_debris",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}
