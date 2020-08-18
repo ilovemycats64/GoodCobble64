@@ -5,12 +5,12 @@ import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootTable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameterSets;
+import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,7 +30,6 @@ public class CobbleGenRandomizer {
     private static final Logger LOGGER = LogManager.getLogger();
     ResourceLocation COBBLE = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
     ResourceLocation STONE = new ResourceLocation("cobblegenrandomizer", "stone_gen");
-    ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
 
     public CobbleGenRandomizer() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
@@ -46,8 +45,6 @@ public class CobbleGenRandomizer {
                 list = Config.BLOCK_LIST_COBBLE.get();
             else if (table == STONE)
                 list = Config.BLOCK_LIST_STONE.get();
-            else if (table == BASALT)
-                list = Config.BLOCK_LIST_BASALT.get();
 
             if (list != null && !list.isEmpty()) {
                 String loot = list.get(world.rand.nextInt(list.size()));
@@ -80,8 +77,6 @@ public class CobbleGenRandomizer {
                 block = getLoot(world, COBBLE);
             else if (event.getNewState().getBlock() == Blocks.STONE)
                 block = getLoot(world, STONE);
-            else if (event.getNewState().getBlock() == Blocks.field_235337_cO_)
-                block = getLoot(world, BASALT);
 
             if (block != Blocks.AIR)
                 event.setNewState(block.getDefaultState());

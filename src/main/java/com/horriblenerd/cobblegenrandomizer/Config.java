@@ -15,12 +15,10 @@ public class Config {
     public static ForgeConfigSpec.BooleanValue USE_CONFIG;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_COBBLE;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_STONE;
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_BASALT;
 
 
     private static final List<String> cobble = new ArrayList<>();
     private static final List<String> stone = new ArrayList<>();
-    private static final List<String> basalt = new ArrayList<>();
 
     static {
         initLists();
@@ -32,7 +30,6 @@ public class Config {
         USE_CONFIG = COMMON_BUILDER.comment("Use config instead of datapack").define("use_config", true);
         BLOCK_LIST_COBBLE = COMMON_BUILDER.comment("Cobble gen").defineList("block_list_cobble", cobble, (b) -> b instanceof String && ResourceLocation.isResouceNameValid((String) b));
         BLOCK_LIST_STONE = COMMON_BUILDER.comment("Stone gen").defineList("block_list_stone", stone, (b) -> b instanceof String && ResourceLocation.isResouceNameValid((String) b));
-        BLOCK_LIST_BASALT = COMMON_BUILDER.comment("Basalt gen").defineList("block_list_basalt", basalt, (b) -> b instanceof String && ResourceLocation.isResouceNameValid((String) b));
 
         COMMON_BUILDER.pop();
         COMMON_CONFIG = COMMON_BUILDER.build();
@@ -53,13 +50,5 @@ public class Config {
         stone.add(Blocks.GRANITE.getRegistryName().toString());
         stone.add(Blocks.DIORITE.getRegistryName().toString());
         stone.add(Blocks.ANDESITE.getRegistryName().toString());
-
-
-        basalt.add(Blocks.field_235337_cO_.getRegistryName().toString());
-        basalt.add(Blocks.field_235406_np_.getRegistryName().toString());
-        basalt.add(Blocks.NETHERRACK.getRegistryName().toString());
-        basalt.add(Blocks.NETHER_QUARTZ_ORE.getRegistryName().toString());
-        basalt.add(Blocks.field_235334_I_.getRegistryName().toString());
-        basalt.add(Blocks.field_235398_nh_.getRegistryName().toString());
     }
 }
