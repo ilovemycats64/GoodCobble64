@@ -36,7 +36,7 @@ public class Config {
 
         COMMON_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
         USE_CONFIG = COMMON_BUILDER.comment("Use config instead of datapack").define("use_config", true);
-        COMMON_BUILDER.comment("List settings", "syntax: [\"modid:block|weight\"]", "example: [\"minecraft:stone|2\",\"minecraft:dirt|1\"").push(CATEGORY_LISTS);
+        COMMON_BUILDER.comment("List settings", "syntax: [\"modid:block|weight\"]", "example: [\"minecraft:stone|2\",\"minecraft:dirt|1\"]").push(CATEGORY_LISTS);
         BLOCK_LIST_COBBLE = COMMON_BUILDER.comment("Cobble gen").defineList("block_list_cobble", cobble, (b) -> b instanceof String && isValid((String) b));
         BLOCK_LIST_STONE = COMMON_BUILDER.comment("Stone gen").defineList("block_list_stone", stone, (b) -> b instanceof String && isValid((String) b));
         BLOCK_LIST_BASALT = COMMON_BUILDER.comment("Basalt gen").defineList("block_list_basalt", basalt, (b) -> b instanceof String && isValid((String) b));
