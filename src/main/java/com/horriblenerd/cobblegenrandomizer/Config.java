@@ -1,14 +1,21 @@
 package com.horriblenerd.cobblegenrandomizer;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
+    public static final String SEPARATOR = "\\|";
+
+
     public static final String CATEGORY_GENERAL = "general";
+    public static final String CATEGORY_LISTS = "lists";
 
     public static ForgeConfigSpec COMMON_CONFIG;
 
@@ -25,41 +32,58 @@ public class Config {
     static {
         initLists();
 
-
         ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 
         COMMON_BUILDER.comment("General settings").push(CATEGORY_GENERAL);
         USE_CONFIG = COMMON_BUILDER.comment("Use config instead of datapack").define("use_config", true);
-        BLOCK_LIST_COBBLE = COMMON_BUILDER.comment("Cobble gen").defineList("block_list_cobble", cobble, (b) -> b instanceof String && ResourceLocation.isResouceNameValid((String) b));
-        BLOCK_LIST_STONE = COMMON_BUILDER.comment("Stone gen").defineList("block_list_stone", stone, (b) -> b instanceof String && ResourceLocation.isResouceNameValid((String) b));
-        BLOCK_LIST_BASALT = COMMON_BUILDER.comment("Basalt gen").defineList("block_list_basalt", basalt, (b) -> b instanceof String && ResourceLocation.isResouceNameValid((String) b));
+        COMMON_BUILDER.comment("List settings", "syntax: [\"modid:block|weight\"]", "example: [\"minecraft:stone|2\",\"minecraft:dirt|1\"").push(CATEGORY_LISTS);
+        BLOCK_LIST_COBBLE = COMMON_BUILDER.comment("Cobble gen").defineList("block_list_cobble", cobble, (b) -> b instanceof String && isValid((String) b));
+        BLOCK_LIST_STONE = COMMON_BUILDER.comment("Stone gen").defineList("block_list_stone", stone, (b) -> b instanceof String && isValid((String) b));
+        BLOCK_LIST_BASALT = COMMON_BUILDER.comment("Basalt gen").defineList("block_list_basalt", basalt, (b) -> b instanceof String && isValid((String) b));
 
         COMMON_BUILDER.pop();
         COMMON_CONFIG = COMMON_BUILDER.build();
     }
 
-    private static void initLists() {
-        cobble.add(Blocks.COBBLESTONE.getRegistryName().toString());
-        cobble.add(Blocks.COAL_ORE.getRegistryName().toString());
-        cobble.add(Blocks.IRON_ORE.getRegistryName().toString());
-        cobble.add(Blocks.REDSTONE_ORE.getRegistryName().toString());
-        cobble.add(Blocks.LAPIS_ORE.getRegistryName().toString());
-        cobble.add(Blocks.EMERALD_ORE.getRegistryName().toString());
-        cobble.add(Blocks.GOLD_ORE.getRegistryName().toString());
-        cobble.add(Blocks.DIAMOND_ORE.getRegistryName().toString());
-
-
-        stone.add(Blocks.STONE.getRegistryName().toString());
-        stone.add(Blocks.GRANITE.getRegistryName().toString());
-        stone.add(Blocks.DIORITE.getRegistryName().toString());
-        stone.add(Blocks.ANDESITE.getRegistryName().toString());
-
-
-        basalt.add(Blocks.field_235337_cO_.getRegistryName().toString());
-        basalt.add(Blocks.field_235406_np_.getRegistryName().toString());
-        basalt.add(Blocks.NETHERRACK.getRegistryName().toString());
-        basalt.add(Blocks.NETHER_QUARTZ_ORE.getRegistryName().toString());
-        basalt.add(Blocks.field_235334_I_.getRegistryName().toString());
-        basalt.add(Blocks.field_235398_nh_.getRegistryName().toString());
+    private static boolean isValid(String s) {
+        String[] strings = s.split(SEPARATOR);
+        boolean resouceNameValid = (ResourceLocation.isResouceNameValid(strings[0]) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(strings[0])) != null);
+        boolean numeric = true;
+        if (strings.length == 2)
+            numeric = StringUtils.isNumeric(strings[1]);
+        return resouceNameValid && numeric;
     }
+
+    private static void initLists() {
+        addBlock(cobble, Blocks.COBBLESTONE, 60);
+        addBlock(cobble, Blocks.COAL_ORE, 25);
+        addBlock(cobble, Blocks.IRON_ORE, 20);
+        addBlock(cobble, Blocks.REDSTONE_ORE, 20);
+        addBlock(cobble, Blocks.LAPIS_ORE, 20);
+        addBlock(cobble, Blocks.EMERALD_ORE, 5);
+        addBlock(cobble, Blocks.GOLD_ORE, 10);
+        addBlock(cobble, Blocks.DIAMOND_ORE, 5);
+
+        addBlock(stone, Blocks.STONE, 30);
+        addBlock(stone, Blocks.GRANITE, 10);
+        addBlock(stone, Blocks.DIORITE, 10);
+        addBlock(stone, Blocks.ANDESITE, 10);
+
+        addBlock(basalt, Blocks.field_235337_cO_, 60); // Basalt
+        addBlock(basalt, Blocks.field_235406_np_, 60); // Blackstone
+        addBlock(basalt, Blocks.NETHERRACK, 60);
+        addBlock(basalt, Blocks.NETHER_QUARTZ_ORE, 30);
+        addBlock(basalt, Blocks.field_235334_I_, 30); // Nether Gold Ore
+        addBlock(basalt, Blocks.field_235398_nh_, 1); // Ancient Debris
+
+    }
+
+    private static void addBlock(List<String> list, Block block, int weight) {
+        list.add(String.format("%s%s%d", block.getRegistryName().toString(), SEPARATOR.replaceAll("\\\\", ""), weight));
+    }
+
+    private static void addBlock(List<String> list, Block block) {
+        addBlock(list, block, 1);
+    }
+
 }

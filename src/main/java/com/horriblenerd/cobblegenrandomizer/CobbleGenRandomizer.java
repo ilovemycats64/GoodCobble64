@@ -1,6 +1,5 @@
 package com.horriblenerd.cobblegenrandomizer;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -9,6 +8,7 @@ import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameterSets;
 import net.minecraft.loot.LootTable;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,7 +21,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("cobblegenrandomizer")
@@ -38,8 +40,12 @@ public class CobbleGenRandomizer {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private Block getLoot(ServerWorld world, ResourceLocation table) {
-        Block block = Blocks.AIR;
+    private List<WeightedBlock> getWeightedList(List<? extends String> list) {
+        return list.stream().map(WeightedBlock::new).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private net.minecraft.block.Block getLoot(ServerWorld world, ResourceLocation table) {
+        net.minecraft.block.Block block = Blocks.AIR;
         if (Config.USE_CONFIG.get()) {
             List<? extends String> list = null;
             if (table == COBBLE)
@@ -50,9 +56,7 @@ public class CobbleGenRandomizer {
                 list = Config.BLOCK_LIST_BASALT.get();
 
             if (list != null && !list.isEmpty()) {
-                String loot = list.get(world.rand.nextInt(list.size()));
-
-                block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(loot));
+                block = WeightedRandom.getRandomItem(world.getRandom(), getWeightedList(list)).getBlock();
             }
 
         } else {
@@ -75,7 +79,7 @@ public class CobbleGenRandomizer {
         IWorld worldIn = event.getWorld();
         if (worldIn instanceof ServerWorld) {
             ServerWorld world = (ServerWorld) worldIn;
-            Block block = Blocks.AIR;
+            net.minecraft.block.Block block = Blocks.AIR;
             if (event.getNewState().getBlock() == Blocks.COBBLESTONE)
                 block = getLoot(world, COBBLE);
             else if (event.getNewState().getBlock() == Blocks.STONE)
@@ -87,5 +91,24 @@ public class CobbleGenRandomizer {
                 event.setNewState(block.getDefaultState());
         }
     }
+
+    private static class WeightedBlock extends WeightedRandom.Item {
+        private final net.minecraft.block.Block block;
+
+        public WeightedBlock(String string) {
+            // I hate Java
+            super(string.split(Config.SEPARATOR).length > 1 ? Integer.parseInt(string.split(Config.SEPARATOR)[1]) : 1);
+            this.block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(string.split(Config.SEPARATOR)[0]));
+        }
+
+        public int getWeight() {
+            return super.itemWeight;
+        }
+
+        public net.minecraft.block.Block getBlock() {
+            return block;
+        }
+    }
+
 }
 
