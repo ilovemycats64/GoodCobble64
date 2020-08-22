@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 public class CobbleGenRandomizer {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
-    ResourceLocation COBBLE = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
-    ResourceLocation STONE = new ResourceLocation("cobblegenrandomizer", "stone_gen");
-    ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
+    final ResourceLocation COBBLE = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
+    final ResourceLocation STONE = new ResourceLocation("cobblegenrandomizer", "stone_gen");
+    final ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
 
     public CobbleGenRandomizer() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);

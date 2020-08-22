@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Config {
     public static final String SEPARATOR = "\\|";
@@ -17,12 +18,12 @@ public class Config {
     public static final String CATEGORY_GENERAL = "general";
     public static final String CATEGORY_LISTS = "lists";
 
-    public static ForgeConfigSpec COMMON_CONFIG;
+    public static final ForgeConfigSpec COMMON_CONFIG;
 
-    public static ForgeConfigSpec.BooleanValue USE_CONFIG;
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_COBBLE;
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_STONE;
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_BASALT;
+    public static final ForgeConfigSpec.BooleanValue USE_CONFIG;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_COBBLE;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_STONE;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> BLOCK_LIST_BASALT;
 
 
     private static final List<String> cobble = new ArrayList<>();
@@ -47,11 +48,11 @@ public class Config {
 
     private static boolean isValid(String s) {
         String[] strings = s.split(SEPARATOR);
-        boolean resouceNameValid = (ResourceLocation.isResouceNameValid(strings[0]) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(strings[0])) != null);
+        boolean resourceNameValid = (ResourceLocation.isResouceNameValid(strings[0]) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(strings[0])) != null);
         boolean numeric = true;
         if (strings.length == 2)
             numeric = StringUtils.isNumeric(strings[1]);
-        return resouceNameValid && numeric;
+        return resourceNameValid && numeric;
     }
 
     private static void initLists() {
@@ -79,7 +80,7 @@ public class Config {
     }
 
     private static void addBlock(List<String> list, Block block, int weight) {
-        list.add(String.format("%s%s%d", block.getRegistryName().toString(), SEPARATOR.replaceAll("\\\\", ""), weight));
+        list.add(String.format("%s%s%d", Objects.requireNonNull(block.getRegistryName()).toString(), SEPARATOR.replaceAll("\\\\", ""), weight));
     }
 
     private static void addBlock(List<String> list, Block block) {
