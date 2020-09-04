@@ -16,6 +16,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -26,21 +27,33 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod("cobblegenrandomizer")
+@Mod(CobbleGenRandomizer.MODID)
 public class CobbleGenRandomizer {
     // Directly reference a log4j logger.
     private static final Logger LOGGER = LogManager.getLogger();
-    final ResourceLocation COBBLE = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
-    final ResourceLocation STONE = new ResourceLocation("cobblegenrandomizer", "stone_gen");
-    final ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
+    public static final String MODID = "cobblegenrandomizer";
+
+    private final ResourceLocation COBBLE = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
+    private final ResourceLocation STONE = new ResourceLocation("cobblegenrandomizer", "stone_gen");
+    private final ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
+
+    public List<WeightedBlock> COBBLE_LIST;
+    public List<WeightedBlock> STONE_LIST;
+    public List<WeightedBlock> BASALT_LIST;
 
     public CobbleGenRandomizer() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
 
         MinecraftForge.EVENT_BUS.register(this);
+    }
+
+    public void reloadLists() {
+        LOGGER.debug("Reloading generator lists...");
+        COBBLE_LIST = getWeightedList(Config.BLOCK_LIST_COBBLE.get());
+        STONE_LIST = getWeightedList(Config.BLOCK_LIST_STONE.get());
+        BASALT_LIST = getWeightedList(Config.BLOCK_LIST_BASALT.get());
     }
 
     private List<WeightedBlock> getWeightedList(List<? extends String> list) {
@@ -49,8 +62,7 @@ public class CobbleGenRandomizer {
             if (WeightedBlock.isValid(s)) {
                 WeightedBlock weightedBlock = new WeightedBlock(s);
                 weightedBlocks.add(weightedBlock);
-            }
-            else {
+            } else {
                 ResourceLocation resourceLocation = ResourceLocation.tryCreate(s.split(Config.SEPARATOR)[0]);
                 if (resourceLocation != null) {
                     ITag<Block> tag = BlockTags.getCollection().get(resourceLocation);
@@ -69,17 +81,30 @@ public class CobbleGenRandomizer {
     private net.minecraft.block.Block getLoot(ServerWorld world, ResourceLocation table) {
         net.minecraft.block.Block block = Blocks.AIR;
         if (Config.USE_CONFIG.get()) {
-            List<? extends String> list = null;
+//            List<? extends String> list = null;
+//            if (table == COBBLE)
+//                list = Config.BLOCK_LIST_COBBLE.get();
+//            else if (table == STONE)
+//                list = Config.BLOCK_LIST_STONE.get();
+//            else if (table == BASALT)
+//                list = Config.BLOCK_LIST_BASALT.get();
+//
+//            if (list != null && !list.isEmpty()) {
+//                block = WeightedRandom.getRandomItem(world.getRandom(), getWeightedList(list)).getBlock();
+//            }
+
+            List<WeightedBlock> list = null;
             if (table == COBBLE)
-                list = Config.BLOCK_LIST_COBBLE.get();
+                list = COBBLE_LIST;
             else if (table == STONE)
-                list = Config.BLOCK_LIST_STONE.get();
+                list = STONE_LIST;
             else if (table == BASALT)
-                list = Config.BLOCK_LIST_BASALT.get();
+                list = BASALT_LIST;
 
             if (list != null && !list.isEmpty()) {
-                block = WeightedRandom.getRandomItem(world.getRandom(), getWeightedList(list)).getBlock();
+                block = WeightedRandom.getRandomItem(world.getRandom(), list).getBlock();
             }
+
 
         } else {
             LootTable loottable = world.getServer().getLootTableManager().getLootTableFromLocation(table);
@@ -112,6 +137,11 @@ public class CobbleGenRandomizer {
             if (block != Blocks.AIR)
                 event.setNewState(block.getDefaultState());
         }
+    }
+
+    @SubscribeEvent
+    public void onWorldLoad(WorldEvent.Load event) {
+        reloadLists();
     }
 
     private static class WeightedBlock extends WeightedRandom.Item {
