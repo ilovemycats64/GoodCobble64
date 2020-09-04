@@ -1,5 +1,6 @@
 package com.horriblenerd.cobblegenrandomizer;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -7,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameterSets;
 import net.minecraft.loot.LootTable;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.IWorld;
@@ -41,7 +44,26 @@ public class CobbleGenRandomizer {
     }
 
     private List<WeightedBlock> getWeightedList(List<? extends String> list) {
-        return list.stream().map(WeightedBlock::new).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<WeightedBlock> weightedBlocks = new ArrayList<>();
+        for (String s : list) {
+            if (WeightedBlock.isValid(s)) {
+                WeightedBlock weightedBlock = new WeightedBlock(s);
+                weightedBlocks.add(weightedBlock);
+            }
+            else {
+                ResourceLocation resourceLocation = ResourceLocation.tryCreate(s.split(Config.SEPARATOR)[0]);
+                if (resourceLocation != null) {
+                    ITag<Block> tag = BlockTags.getCollection().get(resourceLocation);
+                    if (tag != null && !tag.func_230236_b_().isEmpty()) {
+                        int weight = s.split(Config.SEPARATOR).length > 1 ? Integer.parseInt(s.split(Config.SEPARATOR)[1]) : 1;
+                        for (Block b : tag.func_230236_b_()) {
+                            weightedBlocks.add(new WeightedBlock(b, weight));
+                        }
+                    }
+                }
+            }
+        }
+        return weightedBlocks;
     }
 
     private net.minecraft.block.Block getLoot(ServerWorld world, ResourceLocation table) {
@@ -99,6 +121,18 @@ public class CobbleGenRandomizer {
             // I hate Java
             super(string.split(Config.SEPARATOR).length > 1 ? Integer.parseInt(string.split(Config.SEPARATOR)[1]) : 1);
             this.block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(string.split(Config.SEPARATOR)[0]));
+        }
+
+        public WeightedBlock(Block block, int weight) {
+            super(weight);
+            this.block = block;
+        }
+
+        public static boolean isValid(String string) {
+            boolean valid;
+            ResourceLocation resourceLocation = ResourceLocation.tryCreate(string.split(Config.SEPARATOR)[0]);
+            valid = ForgeRegistries.BLOCKS.containsKey(resourceLocation);
+            return valid;
         }
 
         public int getWeight() {
