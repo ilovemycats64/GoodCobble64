@@ -81,17 +81,6 @@ public class CobbleGenRandomizer {
     private net.minecraft.block.Block getLoot(ServerWorld world, ResourceLocation table) {
         net.minecraft.block.Block block = Blocks.AIR;
         if (Config.USE_CONFIG.get()) {
-//            List<? extends String> list = null;
-//            if (table == COBBLE)
-//                list = Config.BLOCK_LIST_COBBLE.get();
-//            else if (table == STONE)
-//                list = Config.BLOCK_LIST_STONE.get();
-//            else if (table == BASALT)
-//                list = Config.BLOCK_LIST_BASALT.get();
-//
-//            if (list != null && !list.isEmpty()) {
-//                block = WeightedRandom.getRandomItem(world.getRandom(), getWeightedList(list)).getBlock();
-//            }
 
             List<WeightedBlock> list = null;
             if (table == COBBLE)
