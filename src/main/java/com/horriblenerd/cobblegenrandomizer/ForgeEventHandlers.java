@@ -50,7 +50,7 @@ public class ForgeEventHandlers {
             LOGGER.info("Successfully loaded generators");
         }
         else {
-            LOGGER.error("An error occured during generator loading");
+            LOGGER.error("An error occurred during generator loading");
         }
     }
 

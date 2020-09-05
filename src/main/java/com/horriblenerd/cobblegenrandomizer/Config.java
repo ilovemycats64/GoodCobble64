@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.horriblenerd.cobblegenrandomizer.util.Util.isValidBlock;
-import static com.horriblenerd.cobblegenrandomizer.util.Util.isValidTag;
+import static com.horriblenerd.cobblegenrandomizer.util.Util.*;
 
 public class Config {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -51,9 +50,9 @@ public class Config {
                 "Syntax: [\"modid:block|weight\"]",
                 "Example: [\"minecraft:stone|2\",\"minecraft:dirt|1\"]",
                 "Forge tags are supported").push(CATEGORY_LISTS);
-        BLOCK_LIST_COBBLE = COMMON_BUILDER.comment("Cobble gen").defineList("block_list_cobble", cobble, (b) -> b instanceof String && isValidBlock((String) b));
-        BLOCK_LIST_STONE = COMMON_BUILDER.comment("Stone gen").defineList("block_list_stone", stone, (b) -> b instanceof String && isValidBlock((String) b));
-        BLOCK_LIST_BASALT = COMMON_BUILDER.comment("Basalt gen").defineList("block_list_basalt", basalt, (b) -> b instanceof String && isValidBlock((String) b));
+        BLOCK_LIST_COBBLE = COMMON_BUILDER.comment("Cobble gen").defineList("block_list_cobble", cobble, (b) -> b instanceof String && (isValidBlock((String) b) || isValidTag((String) b)));
+        BLOCK_LIST_STONE = COMMON_BUILDER.comment("Stone gen").defineList("block_list_stone", stone, (b) -> b instanceof String && (isValidBlock((String) b) || isValidTag((String) b)));
+        BLOCK_LIST_BASALT = COMMON_BUILDER.comment("Basalt gen").defineList("block_list_basalt", basalt, (b) -> b instanceof String && (isValidBlock((String) b) || isValidTag((String) b)));
 
         COMMON_BUILDER.comment("Custom settings").push(CATEGORY_CUSTOM);
         CUSTOM_GENERATORS = COMMON_BUILDER.comment("Custom generators",
@@ -67,45 +66,6 @@ public class Config {
 
         COMMON_BUILDER.pop();
         COMMON_CONFIG = COMMON_BUILDER.build();
-    }
-
-    public static boolean isCustomGeneratorValid(List<Object> l) {
-        if (l == null || l.size() != 3) {
-            return false;
-        }
-        if (!(l.get(0) instanceof String)) {
-            return false;
-        }
-        if (!(l.get(1) instanceof String)) {
-            return false;
-        }
-        if (!(l.get(2) instanceof List<?>)) {
-            return false;
-        }
-
-        String type = (String) l.get(0);
-        String req = (String) l.get(1);
-        List<?> blocks = (List<?>) l.get(2);
-
-        if (!type.equals("cobblestone") && !type.equals("stone") && !type.equals("basalt")) {
-            return false;
-        }
-
-        if (!isValidBlock(req)) {
-            return false;
-        }
-
-        for (Object o : blocks) {
-            if (!(o instanceof String)) {
-                return false;
-            }
-            if (!isValidBlock((String) o) && !isValidTag((String) o)) {
-                LOGGER.debug("Invalid block or tag: " + o);
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private static void initLists() {

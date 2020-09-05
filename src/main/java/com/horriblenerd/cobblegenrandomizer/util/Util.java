@@ -34,7 +34,7 @@ public class Util {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static Generator createGenerator(List<Object> listIn) {
-        if (!Config.isCustomGeneratorValid(listIn)) {
+        if (!isCustomGeneratorValid(listIn)) {
             return null;
         }
 
@@ -60,7 +60,7 @@ public class Util {
                 if (isValidBlock((String) o)) {
                     blockList.add(new WeightedBlock((String) o));
                 }
-                else {
+                else if (isValidTag((String) o)){
                     blockList.addAll(getBlocksFromTag((String) o));
                 }
             }
@@ -159,6 +159,45 @@ public class Util {
         return block;
     }
 
+    public static boolean isCustomGeneratorValid(List<Object> l) {
+        if (l == null || l.size() != 3) {
+            return false;
+        }
+        if (!(l.get(0) instanceof String)) {
+            return false;
+        }
+        if (!(l.get(1) instanceof String)) {
+            return false;
+        }
+        if (!(l.get(2) instanceof List<?>)) {
+            return false;
+        }
+
+        String type = (String) l.get(0);
+        String req = (String) l.get(1);
+        List<?> blocks = (List<?>) l.get(2);
+
+        if (!type.equals("cobblestone") && !type.equals("stone") && !type.equals("basalt")) {
+            return false;
+        }
+
+        if (!isValidBlock(req)) {
+            return false;
+        }
+
+        for (Object o : blocks) {
+            if (!(o instanceof String)) {
+                return false;
+            }
+            if (!isValidBlock((String) o) && !isValidTag((String) o)) {
+                LOGGER.debug("Invalid block or tag: " + o);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static boolean isValidTag(String s) {
         String[] strings = s.split(SEPARATOR);
         boolean resourceNameValid = ResourceLocation.isResouceNameValid(strings[0]);
@@ -178,12 +217,12 @@ public class Util {
         }
 
         ResourceLocation resourceLocation = ResourceLocation.tryCreate(strings[0]);
-        if (resourceLocation == null || !resourceLocation.getNamespace().equals("minecraft")) {
+        if (resourceLocation == null) {
             return false;
         }
 
-        boolean exists = ForgeRegistries.BLOCKS.getValue(resourceLocation) != null;
-        if (!exists) {
+        Block value = ForgeRegistries.BLOCKS.getValue(resourceLocation);
+        if (value == null || value == Blocks.AIR) {
             return false;
         }
 
