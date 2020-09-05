@@ -139,14 +139,6 @@ public class Config {
         addBlock(basalt, Blocks.NETHER_QUARTZ_ORE, 30);
         addBlock(basalt, Blocks.field_235334_I_, 30); // Nether Gold Ore
         addBlock(basalt, Blocks.field_235398_nh_, 1); // Ancient Debris
-
-        ArrayList<String> diamondList = new ArrayList<>();
-        diamondList.add("minecraft:diamond_ore");
-        ArrayList<Object> customList = new ArrayList<>();
-        customList.add("cobblestone");
-        customList.add("minecraft:diamond_block");
-        customList.add(diamondList);
-        custom_gens.add(customList);
     }
 
     private static void addBlock(List<String> list, Block block, int weight) {

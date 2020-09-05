@@ -1,4 +1,4 @@
-package com.horriblenerd.cobblegenrandomizer;
+package com.horriblenerd.cobblegenrandomizer.util;
 
 import net.minecraft.block.Block;
 

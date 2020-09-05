@@ -1,5 +1,6 @@
-package com.horriblenerd.cobblegenrandomizer;
+package com.horriblenerd.cobblegenrandomizer.util;
 
+import com.horriblenerd.cobblegenrandomizer.Config;
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
