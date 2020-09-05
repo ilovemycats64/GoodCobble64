@@ -70,30 +70,39 @@ public class Config {
     }
 
     public static boolean isCustomGeneratorValid(List<Object> l) {
-        if (l == null || l.size() != 3)
+        if (l == null || l.size() != 3) {
             return false;
-        if (!(l.get(0) instanceof String))
+        }
+        if (!(l.get(0) instanceof String)) {
             return false;
-        if (!(l.get(1) instanceof String))
+        }
+        if (!(l.get(1) instanceof String)) {
             return false;
-        if (!(l.get(2) instanceof List<?>))
+        }
+        if (!(l.get(2) instanceof List<?>)) {
             return false;
+        }
 
         String type = (String) l.get(0);
         String req = (String) l.get(1);
         List<?> blocks = (List<?>) l.get(2);
 
-        if (!type.equals("cobblestone") && !type.equals("stone") && !type.equals("basalt")) return false;
+        if (!type.equals("cobblestone") && !type.equals("stone") && !type.equals("basalt")) {
+            return false;
+        }
 
         boolean resourceNameValid = (ResourceLocation.isResouceNameValid(req) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(req)) != null);
-        if (!resourceNameValid)
+        if (!resourceNameValid) {
             return false;
+        }
 
         for (Object o : blocks) {
-            if (!(o instanceof String))
+            if (!(o instanceof String)) {
                 return false;
-            if (!isValidBlock((String) o))
+            }
+            if (!isValidBlock((String) o)) {
                 return false;
+            }
         }
 
         return true;
@@ -103,8 +112,9 @@ public class Config {
         String[] strings = s.split(SEPARATOR);
         boolean resourceNameValid = (ResourceLocation.isResouceNameValid(strings[0]) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(strings[0])) != null);
         boolean numeric = true;
-        if (strings.length == 2)
+        if (strings.length == 2) {
             numeric = StringUtils.isNumeric(strings[1]);
+        }
         return resourceNameValid && numeric;
     }
 
