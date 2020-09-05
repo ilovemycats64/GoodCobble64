@@ -12,6 +12,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ITag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,13 +36,11 @@ public class CobbleGenRandomizer {
     private static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "cobblegenrandomizer";
 
-    private final ResourceLocation COBBLE = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
-    private final ResourceLocation STONE = new ResourceLocation("cobblegenrandomizer", "stone_gen");
-    private final ResourceLocation BASALT = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
-
     public List<WeightedBlock> COBBLE_LIST;
     public List<WeightedBlock> STONE_LIST;
     public List<WeightedBlock> BASALT_LIST;
+
+    public List<Generator> CUSTOM_GENERATOR_LIST;
 
     public CobbleGenRandomizer() {
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
@@ -54,6 +53,41 @@ public class CobbleGenRandomizer {
         COBBLE_LIST = getWeightedList(Config.BLOCK_LIST_COBBLE.get());
         STONE_LIST = getWeightedList(Config.BLOCK_LIST_STONE.get());
         BASALT_LIST = getWeightedList(Config.BLOCK_LIST_BASALT.get());
+
+        LOGGER.debug("Reloading custom generators...");
+        CUSTOM_GENERATOR_LIST = new ArrayList<>();
+        for (List<Object> l : Config.CUSTOM_GENERATORS.get()) {
+            Generator gen = createGenerator(l);
+            if (gen != null) CUSTOM_GENERATOR_LIST.add(gen);
+            else {
+                LOGGER.error("Invalid custom generator: " + l);
+            }
+        }
+    }
+
+    private Generator createGenerator(List<Object> listIn) {
+        if (!Config.isCustomGeneratorValid(listIn)) return null;
+
+        String typeString = (String) listIn.get(0);
+        Generator.Type type;
+        if (typeString.equals("cobblestone")) type = Generator.Type.COBBLESTONE;
+        else if (typeString.equals("stone")) type = Generator.Type.STONE;
+        else return null;
+
+        String req = (String) listIn.get(1);
+        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(req));
+
+        List<?> list = (List<?>) listIn.get(2);
+        ArrayList<WeightedBlock> blockList = new ArrayList<>();
+        for (Object o : list) {
+            if (o instanceof String) {
+                if (Config.isValidBlock((String) o)) {
+                    blockList.add(new WeightedBlock((String) o));
+                }
+            }
+        }
+
+        return new Generator(type, block, blockList);
     }
 
     private List<WeightedBlock> getWeightedList(List<? extends String> list) {
@@ -78,17 +112,28 @@ public class CobbleGenRandomizer {
         return weightedBlocks;
     }
 
-    private net.minecraft.block.Block getLoot(ServerWorld world, ResourceLocation table) {
+    private net.minecraft.block.Block getLoot(ServerWorld world, BlockPos pos, Generator.Type type) {
         net.minecraft.block.Block block = Blocks.AIR;
         if (Config.USE_CONFIG.get()) {
 
             List<WeightedBlock> list = null;
-            if (table == COBBLE)
-                list = COBBLE_LIST;
-            else if (table == STONE)
-                list = STONE_LIST;
-            else if (table == BASALT)
-                list = BASALT_LIST;
+
+            if (!CUSTOM_GENERATOR_LIST.isEmpty()) {
+                for (Generator g : CUSTOM_GENERATOR_LIST) {
+                    if (g.getType() == type && g.getBlock() == world.getBlockState(pos.down()).getBlock()) {
+                        list = g.getBlockList();
+                    }
+                }
+            }
+
+            if (list == null || list.isEmpty()) {
+                if (type == Generator.Type.COBBLESTONE)
+                    list = COBBLE_LIST;
+                else if (type == Generator.Type.STONE)
+                    list = STONE_LIST;
+                else if (type == Generator.Type.BASALT)
+                    list = BASALT_LIST;
+            }
 
             if (list != null && !list.isEmpty()) {
                 block = WeightedRandom.getRandomItem(world.getRandom(), list).getBlock();
@@ -96,7 +141,11 @@ public class CobbleGenRandomizer {
 
 
         } else {
-            LootTable loottable = world.getServer().getLootTableManager().getLootTableFromLocation(table);
+            ResourceLocation resourceLocation = new ResourceLocation("");
+            if (type == Generator.Type.COBBLESTONE) resourceLocation = new ResourceLocation("cobblegenrandomizer", "cobble_gen");
+            else if (type == Generator.Type.STONE) resourceLocation = new ResourceLocation("cobblegenrandomizer", "stone_gen");
+            else if (type == Generator.Type.BASALT) resourceLocation = new ResourceLocation("cobblegenrandomizer", "basalt_gen");
+            LootTable loottable = world.getServer().getLootTableManager().getLootTableFromLocation(resourceLocation);
             LootContext.Builder lootcontext$builder = (new LootContext.Builder(world));
             List<ItemStack> list = loottable.generate(lootcontext$builder.build(LootParameterSets.EMPTY));
             if (!list.isEmpty()) {
@@ -117,11 +166,11 @@ public class CobbleGenRandomizer {
             ServerWorld world = (ServerWorld) worldIn;
             net.minecraft.block.Block block = Blocks.AIR;
             if (event.getNewState().getBlock() == Blocks.COBBLESTONE)
-                block = getLoot(world, COBBLE);
+                block = getLoot(world, event.getPos(), Generator.Type.COBBLESTONE);
             else if (event.getNewState().getBlock() == Blocks.STONE)
-                block = getLoot(world, STONE);
+                block = getLoot(world, event.getPos(), Generator.Type.STONE);
             else if (event.getNewState().getBlock() == Blocks.field_235337_cO_)
-                block = getLoot(world, BASALT);
+                block = getLoot(world, event.getPos(), Generator.Type.BASALT);
 
             if (block != Blocks.AIR)
                 event.setNewState(block.getDefaultState());
@@ -133,35 +182,7 @@ public class CobbleGenRandomizer {
         reloadLists();
     }
 
-    private static class WeightedBlock extends WeightedRandom.Item {
-        private final net.minecraft.block.Block block;
 
-        public WeightedBlock(String string) {
-            // I hate Java
-            super(string.split(Config.SEPARATOR).length > 1 ? Integer.parseInt(string.split(Config.SEPARATOR)[1]) : 1);
-            this.block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(string.split(Config.SEPARATOR)[0]));
-        }
-
-        public WeightedBlock(Block block, int weight) {
-            super(weight);
-            this.block = block;
-        }
-
-        public static boolean isValid(String string) {
-            boolean valid;
-            ResourceLocation resourceLocation = ResourceLocation.tryCreate(string.split(Config.SEPARATOR)[0]);
-            valid = ForgeRegistries.BLOCKS.containsKey(resourceLocation);
-            return valid;
-        }
-
-        public int getWeight() {
-            return super.itemWeight;
-        }
-
-        public net.minecraft.block.Block getBlock() {
-            return block;
-        }
-    }
 
 }
 
