@@ -2,16 +2,16 @@ package com.horriblenerd.cobblegenrandomizer;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.horriblenerd.cobblegenrandomizer.util.Util.isValidBlock;
+import static com.horriblenerd.cobblegenrandomizer.util.Util.isValidTag;
 
 public class Config {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -91,8 +91,7 @@ public class Config {
             return false;
         }
 
-        boolean resourceNameValid = (ResourceLocation.isResouceNameValid(req) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(req)) != null);
-        if (!resourceNameValid) {
+        if (!isValidBlock(req)) {
             return false;
         }
 
@@ -100,22 +99,13 @@ public class Config {
             if (!(o instanceof String)) {
                 return false;
             }
-            if (!isValidBlock((String) o)) {
+            if (!isValidBlock((String) o) && !isValidTag((String) o)) {
+                LOGGER.debug("Invalid block or tag: " + o);
                 return false;
             }
         }
 
         return true;
-    }
-
-    public static boolean isValidBlock(String s) {
-        String[] strings = s.split(SEPARATOR);
-        boolean resourceNameValid = (ResourceLocation.isResouceNameValid(strings[0]) && ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(strings[0])) != null);
-        boolean numeric = true;
-        if (strings.length == 2) {
-            numeric = StringUtils.isNumeric(strings[1]);
-        }
-        return resourceNameValid && numeric;
     }
 
     private static void initLists() {

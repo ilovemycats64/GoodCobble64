@@ -1,16 +1,13 @@
 package com.horriblenerd.cobblegenrandomizer;
 
-import com.horriblenerd.cobblegenrandomizer.commands.ModCommands;
 import com.horriblenerd.cobblegenrandomizer.util.Generator;
 import com.horriblenerd.cobblegenrandomizer.util.Util;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

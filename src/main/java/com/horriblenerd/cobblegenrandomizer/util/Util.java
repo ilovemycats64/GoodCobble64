@@ -16,6 +16,7 @@ import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.horriblenerd.cobblegenrandomizer.CobbleGenRandomizer.GENERATORS;
+import static com.horriblenerd.cobblegenrandomizer.Config.SEPARATOR;
 
 /**
  * Created by HorribleNerd on 05/09/2020
@@ -54,13 +56,31 @@ public class Util {
         List<?> list = (List<?>) listIn.get(2);
         ArrayList<WeightedBlock> blockList = new ArrayList<>();
         for (Object o : list) {
-            LOGGER.debug(o);
-            if (o instanceof String && Config.isValidBlock((String) o)) {
-                blockList.add(new WeightedBlock((String) o));
+            if (o instanceof String) {
+                if (isValidBlock((String) o)) {
+                    blockList.add(new WeightedBlock((String) o));
+                }
+                else {
+                    blockList.addAll(getBlocksFromTag((String) o));
+                }
             }
         }
-
         return new Generator(type, block, blockList);
+    }
+
+    public static List<WeightedBlock> getBlocksFromTag(String s) {
+        ArrayList<WeightedBlock> weightedBlocks = new ArrayList<>();
+        ResourceLocation resourceLocation = ResourceLocation.tryCreate(s.split(SEPARATOR)[0]);
+        if (resourceLocation != null) {
+            ITag<Block> tag = BlockTags.getCollection().get(resourceLocation);
+            if (tag != null && !tag.func_230236_b_().isEmpty()) {
+                int weight = s.split(SEPARATOR).length > 1 ? Integer.parseInt(s.split(SEPARATOR)[1]) : 1;
+                for (Block b : tag.func_230236_b_()) {
+                    weightedBlocks.add(new WeightedBlock(b, weight));
+                }
+            }
+        }
+        return weightedBlocks;
     }
 
     public static List<WeightedBlock> getWeightedList(List<? extends String> list) {
@@ -73,16 +93,7 @@ public class Util {
             }
             // Add all blocks with certain tag
             else {
-                ResourceLocation resourceLocation = ResourceLocation.tryCreate(s.split(Config.SEPARATOR)[0]);
-                if (resourceLocation != null) {
-                    ITag<Block> tag = BlockTags.getCollection().get(resourceLocation);
-                    if (tag != null && !tag.func_230236_b_().isEmpty()) {
-                        int weight = s.split(Config.SEPARATOR).length > 1 ? Integer.parseInt(s.split(Config.SEPARATOR)[1]) : 1;
-                        for (Block b : tag.func_230236_b_()) {
-                            weightedBlocks.add(new WeightedBlock(b, weight));
-                        }
-                    }
-                }
+                weightedBlocks.addAll(getBlocksFromTag(s));
             }
         }
         return weightedBlocks;
@@ -146,6 +157,41 @@ public class Util {
             }
         }
         return block;
+    }
+
+    public static boolean isValidTag(String s) {
+        String[] strings = s.split(SEPARATOR);
+        boolean resourceNameValid = ResourceLocation.isResouceNameValid(strings[0]);
+        if (!resourceNameValid) {
+            return false;
+        }
+
+        ResourceLocation resourceLocation = ResourceLocation.tryCreate(strings[0]);
+        return resourceLocation != null;
+    }
+
+    public static boolean isValidBlock(String s) {
+        String[] strings = s.split(SEPARATOR);
+        boolean resourceNameValid = ResourceLocation.isResouceNameValid(strings[0]);
+        if (!resourceNameValid) {
+            return false;
+        }
+
+        ResourceLocation resourceLocation = ResourceLocation.tryCreate(strings[0]);
+        if (resourceLocation == null || !resourceLocation.getNamespace().equals("minecraft")) {
+            return false;
+        }
+
+        boolean exists = ForgeRegistries.BLOCKS.getValue(resourceLocation) != null;
+        if (!exists) {
+            return false;
+        }
+
+        boolean numeric = true;
+        if (strings.length == 2) {
+            numeric = StringUtils.isNumeric(strings[1]);
+        }
+        return numeric;
     }
 
 }
