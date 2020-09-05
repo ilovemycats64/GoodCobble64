@@ -61,8 +61,11 @@ public class Config {
                 "Type: cobblestone, stone",
                 "Block: resource location of the block below the generated block",
                 "List: see List settings",
-                "Example:",
-                "custom_generators = [[\"cobblestone\", \"minecraft:diamond_block\", [\"minecraft:diamond_ore\"]]]").defineList("custom_generators", custom_gens, (p) -> p instanceof List && isCustomGeneratorValid((List<Object>) p));
+                "Examples:",
+                "custom_generators = custom_generators = [",
+                "   [\"cobblestone\", \"minecraft:diamond_block\", [\"minecraft:diamond_block\"]],",
+                "   [\"cobblestone\", \"minecraft:dirt\", [\"forge:dirt\"]],",
+                "   [\"cobblestone\", \"minecraft:white_wool\", [\"minecraft:wool\"]]]").defineList("custom_generators", custom_gens, (p) -> p instanceof List && isCustomGeneratorValid((List<Object>) p));
 
         COMMON_BUILDER.pop();
         COMMON_CONFIG = COMMON_BUILDER.build();
