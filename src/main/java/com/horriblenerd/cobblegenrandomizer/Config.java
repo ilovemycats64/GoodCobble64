@@ -62,7 +62,7 @@ public class Config {
                 "Block: resource location of the block below the generated block",
                 "List: see List settings",
                 "Examples:",
-                "custom_generators = custom_generators = [",
+                "custom_generators = [",
                 "   [\"cobblestone\", \"minecraft:diamond_block\", [\"minecraft:diamond_block\"]],",
                 "   [\"cobblestone\", \"minecraft:dirt\", [\"forge:dirt\"]],",
                 "   [\"cobblestone\", \"minecraft:white_wool\", [\"minecraft:wool\"]]]").defineList("custom_generators", custom_gens, (p) -> p instanceof List && isCustomGeneratorValid((List<Object>) p));
