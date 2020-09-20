@@ -30,7 +30,7 @@ public class CommandReload implements Command<CommandSource> {
         }
         else {
             msg = new StringTextComponent("An error occured during generator loading");
-            msg.func_240699_a_(TextFormatting.RED);
+            msg.mergeStyle(TextFormatting.RED);
         }
         context.getSource().sendFeedback(msg, true);
         return 0;

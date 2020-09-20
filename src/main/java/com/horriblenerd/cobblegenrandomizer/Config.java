@@ -86,12 +86,12 @@ public class Config {
         addBlock(stone, Blocks.DIORITE, 10);
         addBlock(stone, Blocks.ANDESITE, 10);
 
-        addBlock(basalt, Blocks.field_235337_cO_, 60); // Basalt
-        addBlock(basalt, Blocks.field_235406_np_, 60); // Blackstone
+        addBlock(basalt, Blocks.BASALT, 60); // Basalt
+        addBlock(basalt, Blocks.BLACKSTONE, 60); // Blackstone
         addBlock(basalt, Blocks.NETHERRACK, 60);
         addBlock(basalt, Blocks.NETHER_QUARTZ_ORE, 30);
-        addBlock(basalt, Blocks.field_235334_I_, 30); // Nether Gold Ore
-        addBlock(basalt, Blocks.field_235398_nh_, 1); // Ancient Debris
+        addBlock(basalt, Blocks.NETHER_GOLD_ORE, 30); // Nether Gold Ore
+        addBlock(basalt, Blocks.ANCIENT_DEBRIS, 1); // Ancient Debris
     }
 
     private static void addBlock(List<String> list, Block block, int weight) {

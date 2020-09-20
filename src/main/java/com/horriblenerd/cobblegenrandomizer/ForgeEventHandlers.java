@@ -33,7 +33,7 @@ public class ForgeEventHandlers {
             else if (event.getNewState().getBlock() == Blocks.STONE) {
                 block = Util.getLoot(world, event.getPos(), Generator.Type.STONE);
             }
-            else if (event.getNewState().getBlock() == Blocks.field_235337_cO_) {
+            else if (event.getNewState().getBlock() == Blocks.BASALT) {
                 block = Util.getLoot(world, event.getPos(), Generator.Type.BASALT);
             }
 

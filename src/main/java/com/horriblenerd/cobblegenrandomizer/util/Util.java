@@ -73,9 +73,9 @@ public class Util {
         ResourceLocation resourceLocation = ResourceLocation.tryCreate(s.split(SEPARATOR)[0]);
         if (resourceLocation != null) {
             ITag<Block> tag = BlockTags.getCollection().get(resourceLocation);
-            if (tag != null && !tag.func_230236_b_().isEmpty()) {
+            if (tag != null && !tag.getAllElements().isEmpty()) {
                 int weight = s.split(SEPARATOR).length > 1 ? Integer.parseInt(s.split(SEPARATOR)[1]) : 1;
-                for (Block b : tag.func_230236_b_()) {
+                for (Block b : tag.getAllElements()) {
                     weightedBlocks.add(new WeightedBlock(b, weight));
                 }
             }
