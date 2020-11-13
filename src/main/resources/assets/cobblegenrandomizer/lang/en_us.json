@@ -1,7 +1,7 @@
 {
-  "cobblegenrandomizer.jei.cobbleCategory": "Cobblestone Generation",
-  "cobblegenrandomizer.jei.stoneCategory": "Stone Generation",
-  "cobblegenrandomizer.jei.basaltCategory": "Basalt Generation",
-  "cobblegenrandomizer.jei.customCategory": "Custom Generation",
+  "cobblegenrandomizer.jei.cobbleCategory": "Cobblestone Generating",
+  "cobblegenrandomizer.jei.stoneCategory": "Stone Generating",
+  "cobblegenrandomizer.jei.basaltCategory": "Basalt Generating",
+  "cobblegenrandomizer.jei.customCategory": "Custom Generating",
   "cobblegenrandomizer.jei.weight": "Weight"
 }
