@@ -13,6 +13,7 @@ import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -141,7 +142,7 @@ public abstract class GeneratorRecipeCategoryBase<T extends GeneratorRecipeWrapp
     @Override
     public void draw(T recipe, MatrixStack ms, double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
-        ITextComponent weightString = new StringTextComponent(String.format("Weight: %d", recipe.weightedBlock.getWeight()));
+        ITextComponent weightString = new StringTextComponent(String.format("%s: %d", I18n.format("cobblegenrandomizer.jei.weight"), recipe.weightedBlock.getWeight()));
         int y = (1 + this.size) * 18;
         minecraft.fontRenderer.func_243248_b(ms, weightString, 2, y, 0xFF808080);
     }
