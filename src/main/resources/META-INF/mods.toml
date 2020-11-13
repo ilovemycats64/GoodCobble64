@@ -15,7 +15,7 @@ license="MIT"
 # The modid of the mod
 modId="cobblegenrandomizer" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="${version}" #mandatory
+version="1.16-5.0" #mandatory
  # A display name for the mod
 displayName="CobbleGenRandomizer" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
@@ -39,7 +39,7 @@ Framework that allows modpack devs to customize cobble generators.
     # Does this dependency have to exist - if not, ordering below must be specified
     mandatory=true #mandatory
     # The version range of the dependency
-    versionRange="${forge_version_range}" #mandatory
+    versionRange="[34.0.3,)" #mandatory
     # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
     ordering="NONE"
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
@@ -48,6 +48,6 @@ Framework that allows modpack devs to customize cobble generators.
 [[dependencies.cobblegenrandomizer]]
     modId="minecraft"
     mandatory=true
-    versionRange="${minecraft_version_range}"
+    versionRange="[1.16.2, 1.17)"
     ordering="NONE"
     side="BOTH"
