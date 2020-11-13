@@ -19,6 +19,11 @@ public class GeneratorRecipeCategory extends GeneratorRecipeCategoryBase<Generat
         this.UID = id;
     }
 
+    public GeneratorRecipeCategory(IGuiHelper guiHelper, ItemStack icon, String name, ResourceLocation id, int size) {
+        super(guiHelper, icon, name, size);
+        this.UID = id;
+    }
+
     @Nonnull
     @Override
     public ResourceLocation getUid() {

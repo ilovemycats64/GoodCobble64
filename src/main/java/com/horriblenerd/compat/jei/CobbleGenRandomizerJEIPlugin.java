@@ -7,6 +7,8 @@ import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,7 +33,10 @@ public class CobbleGenRandomizerJEIPlugin implements IModPlugin {
         cobblestone_generator = new GeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper(), Items.COBBLESTONE, "Cobblestone Generator", new ResourceLocation(CobbleGenRandomizer.MODID, "cobble_gen"), 0);
         stone_generator = new GeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper(), Items.STONE, "Stone Generator", new ResourceLocation(CobbleGenRandomizer.MODID, "stone_gen"), 1);
         basalt_generator = new GeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper(), Items.BASALT, "Basalt Generator", new ResourceLocation(CobbleGenRandomizer.MODID, "basalt_gen"), 1);
-        custom_generator = new GeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper(), Items.COBBLESTONE, "Custom Generators", new ResourceLocation(CobbleGenRandomizer.MODID, "custom_gen"), 2);
+
+        ItemStack custom_icon = new ItemStack(Items.COBBLESTONE);
+        custom_icon.addEnchantment(Enchantments.FORTUNE, 0);
+        custom_generator = new GeneratorRecipeCategory(registration.getJeiHelpers().getGuiHelper(), custom_icon, "Custom Generators", new ResourceLocation(CobbleGenRandomizer.MODID, "custom_gen"), 2);
 
         registration.addRecipeCategories(cobblestone_generator);
         registration.addRecipeCategories(stone_generator);
