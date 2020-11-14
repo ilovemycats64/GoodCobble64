@@ -20,11 +20,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.RegEx;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 
 import static com.horriblenerd.cobblegenrandomizer.CobbleGenRandomizer.GENERATORS;
 import static com.horriblenerd.cobblegenrandomizer.Config.SEPARATOR;
+import static net.minecraft.util.ResourceLocation.validatePathChar;
 
 /**
  * Created by HorribleNerd on 05/09/2020
@@ -200,7 +204,7 @@ public class Util {
 
     public static boolean isValidTag(String s) {
         String[] strings = s.split(SEPARATOR);
-        boolean resourceNameValid = ResourceLocation.isResouceNameValid(strings[0]);
+        boolean resourceNameValid = isResourceNameValid(strings[0]);
         if (!resourceNameValid) {
             return false;
         }
@@ -211,7 +215,7 @@ public class Util {
 
     public static boolean isValidBlock(String s) {
         String[] strings = s.split(SEPARATOR);
-        boolean resourceNameValid = ResourceLocation.isResouceNameValid(strings[0]);
+        boolean resourceNameValid = isResourceNameValid(strings[0]);
         if (!resourceNameValid) {
             return false;
         }
@@ -231,6 +235,27 @@ public class Util {
             numeric = StringUtils.isNumeric(strings[1]);
         }
         return numeric;
+    }
+
+    public static boolean isResourceNameValid(String resourceName) {
+        String[] split = resourceName.split(":");
+        if (split.length == 1) return isValidPath(split[0]);
+        if (split.length == 2) {
+            return isValidPath(split[0]) && isValidPath(split[1]);
+        }
+        return false;
+
+    }
+
+    private static boolean isValidPath(String path) {
+        for (int i = 0; i < path.length(); i++) {
+            if (!isValidChar(path.charAt(i))) return false;
+        }
+        return true;
+    }
+
+    private static boolean isValidChar(char c) {
+            return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.';
     }
 
 }
