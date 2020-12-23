@@ -255,7 +255,7 @@ public class Util {
     }
 
     private static boolean isValidChar(char c) {
-            return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.';
+            return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.'|| c == '/';
     }
 
 }
