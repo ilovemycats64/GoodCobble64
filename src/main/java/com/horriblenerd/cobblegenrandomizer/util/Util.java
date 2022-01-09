@@ -1,34 +1,31 @@
 package com.horriblenerd.cobblegenrandomizer.util;
 
 import com.horriblenerd.cobblegenrandomizer.Config;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameterSets;
-import net.minecraft.loot.LootTable;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.tags.Tag;
+import net.minecraft.util.random.WeightedRandom;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.RegEx;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
+import java.util.Optional;
 
 import static com.horriblenerd.cobblegenrandomizer.CobbleGenRandomizer.GENERATORS;
 import static com.horriblenerd.cobblegenrandomizer.Config.SEPARATOR;
-import static net.minecraft.util.ResourceLocation.validatePathChar;
 
 /**
  * Created by HorribleNerd on 05/09/2020
@@ -55,7 +52,7 @@ public class Util {
         }
 
         String req = (String) listIn.get(1);
-        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryCreate(req));
+        Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(req));
 
         List<?> list = (List<?>) listIn.get(2);
         ArrayList<WeightedBlock> blockList = new ArrayList<>();
@@ -64,7 +61,7 @@ public class Util {
                 if (isValidBlock((String) o)) {
                     blockList.add(new WeightedBlock((String) o));
                 }
-                else if (isValidTag((String) o)){
+                else if (isValidTag((String) o)) {
                     blockList.addAll(getBlocksFromTag((String) o));
                 }
             }
@@ -74,12 +71,12 @@ public class Util {
 
     public static List<WeightedBlock> getBlocksFromTag(String s) {
         ArrayList<WeightedBlock> weightedBlocks = new ArrayList<>();
-        ResourceLocation resourceLocation = ResourceLocation.tryCreate(s.split(SEPARATOR)[0]);
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(s.split(SEPARATOR)[0]);
         if (resourceLocation != null) {
-            ITag<Block> tag = BlockTags.getCollection().get(resourceLocation);
-            if (tag != null && !tag.getAllElements().isEmpty()) {
+            Tag<Block> tag = BlockTags.getAllTags().getTag(resourceLocation);
+            if (tag != null && !tag.getValues().isEmpty()) {
                 int weight = s.split(SEPARATOR).length > 1 ? Integer.parseInt(s.split(SEPARATOR)[1]) : 1;
-                for (Block b : tag.getAllElements()) {
+                for (Block b : tag.getValues()) {
                     weightedBlocks.add(new WeightedBlock(b, weight));
                 }
             }
@@ -103,8 +100,8 @@ public class Util {
         return weightedBlocks;
     }
 
-    public static net.minecraft.block.Block getLoot(ServerWorld world, BlockPos pos, Generator.Type type) {
-        net.minecraft.block.Block block = Blocks.AIR;
+    public static Block getLoot(ServerLevel world, BlockPos pos, Generator.Type type) {
+        Block block = Blocks.AIR;
         if (Config.USE_CONFIG.get()) {
 
             List<WeightedBlock> list = null;
@@ -112,7 +109,7 @@ public class Util {
             // Check for a custom generator that satisfies the conditions
             if (!GENERATORS.CUSTOM_GENERATOR_LIST.isEmpty()) {
                 for (Generator g : GENERATORS.CUSTOM_GENERATOR_LIST) {
-                    if (g.getType() == type && g.getBlock() == world.getBlockState(pos.down()).getBlock()) {
+                    if (g.getType() == type && g.getBlock() == world.getBlockState(pos.below()).getBlock()) {
                         list = g.getBlockList();
                         break;
                     }
@@ -133,7 +130,10 @@ public class Util {
             }
 
             if (list != null && !list.isEmpty()) {
-                block = WeightedRandom.getRandomItem(world.getRandom(), list).getBlock();
+                Optional<WeightedBlock> randomItem = WeightedRandom.getRandomItem(world.getRandom(), list);
+                if (randomItem.isPresent()) {
+                    block = randomItem.get().getBlock();
+                }
             }
         }
         else {
@@ -149,11 +149,11 @@ public class Util {
             }
 
             // Load the correct loottable and get a random block
-            LootTable loottable = world.getServer().getLootTableManager().getLootTableFromLocation(resourceLocation);
+            LootTable loottable = world.getServer().getLootTables().get(resourceLocation);
             LootContext.Builder lootcontext$builder = (new LootContext.Builder(world));
-            List<ItemStack> list = loottable.generate(lootcontext$builder.build(LootParameterSets.EMPTY));
+            List<ItemStack> list = loottable.getRandomItems(lootcontext$builder.create(LootContextParamSet.builder().build()));
             if (!list.isEmpty()) {
-                ItemStack loot = list.get(world.rand.nextInt(list.size()));
+                ItemStack loot = list.get(world.random.nextInt(list.size()));
                 Item item = loot.getItem();
                 if (item instanceof BlockItem) {
                     block = ((BlockItem) item).getBlock();
@@ -167,19 +167,15 @@ public class Util {
         if (l == null || l.size() != 3) {
             return false;
         }
-        if (!(l.get(0) instanceof String)) {
+        if (!(l.get(0) instanceof String type)) {
             return false;
         }
-        if (!(l.get(1) instanceof String)) {
+        if (!(l.get(1) instanceof String req)) {
             return false;
         }
-        if (!(l.get(2) instanceof List<?>)) {
+        if (!(l.get(2) instanceof List<?> blocks)) {
             return false;
         }
-
-        String type = (String) l.get(0);
-        String req = (String) l.get(1);
-        List<?> blocks = (List<?>) l.get(2);
 
         if (!type.equals("cobblestone") && !type.equals("stone") && !type.equals("basalt")) {
             return false;
@@ -209,7 +205,7 @@ public class Util {
             return false;
         }
 
-        ResourceLocation resourceLocation = ResourceLocation.tryCreate(strings[0]);
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(strings[0]);
         return resourceLocation != null;
     }
 
@@ -220,7 +216,7 @@ public class Util {
             return false;
         }
 
-        ResourceLocation resourceLocation = ResourceLocation.tryCreate(strings[0]);
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(strings[0]);
         if (resourceLocation == null) {
             return false;
         }
@@ -239,7 +235,9 @@ public class Util {
 
     public static boolean isResourceNameValid(String resourceName) {
         String[] split = resourceName.split(":");
-        if (split.length == 1) return isValidPath(split[0]);
+        if (split.length == 1) {
+            return isValidPath(split[0]);
+        }
         if (split.length == 2) {
             return isValidPath(split[0]) && isValidPath(split[1]);
         }
@@ -249,13 +247,15 @@ public class Util {
 
     private static boolean isValidPath(String path) {
         for (int i = 0; i < path.length(); i++) {
-            if (!isValidChar(path.charAt(i))) return false;
+            if (!isValidChar(path.charAt(i))) {
+                return false;
+            }
         }
         return true;
     }
 
     private static boolean isValidChar(char c) {
-            return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.'|| c == '/';
+        return c == '_' || c == '-' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '.' || c == '/';
     }
 
 }

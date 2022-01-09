@@ -2,9 +2,10 @@ package com.horriblenerd.cobblegenrandomizer;
 
 import com.horriblenerd.cobblegenrandomizer.util.Generator;
 import com.horriblenerd.cobblegenrandomizer.util.Util;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,23 +23,22 @@ public class ForgeEventHandlers {
 
     @SubscribeEvent
     public void onFluidPlaceBlockEvent(BlockEvent.FluidPlaceBlockEvent event) {
-        IWorld worldIn = event.getWorld();
-        if (worldIn instanceof ServerWorld) {
-            ServerWorld world = (ServerWorld) worldIn;
-            net.minecraft.block.Block block = Blocks.AIR;
+        LevelAccessor worldIn = event.getWorld();
+        if (worldIn instanceof ServerLevel serverLevel) {
+            Block block = Blocks.AIR;
 
             if (event.getNewState().getBlock() == Blocks.COBBLESTONE) {
-                block = Util.getLoot(world, event.getPos(), Generator.Type.COBBLESTONE);
+                block = Util.getLoot(serverLevel, event.getPos(), Generator.Type.COBBLESTONE);
             }
             else if (event.getNewState().getBlock() == Blocks.STONE) {
-                block = Util.getLoot(world, event.getPos(), Generator.Type.STONE);
+                block = Util.getLoot(serverLevel, event.getPos(), Generator.Type.STONE);
             }
             else if (event.getNewState().getBlock() == Blocks.BASALT) {
-                block = Util.getLoot(world, event.getPos(), Generator.Type.BASALT);
+                block = Util.getLoot(serverLevel, event.getPos(), Generator.Type.BASALT);
             }
 
             if (block != Blocks.AIR) {
-                event.setNewState(block.getDefaultState());
+                event.setNewState(block.defaultBlockState());
             }
         }
     }

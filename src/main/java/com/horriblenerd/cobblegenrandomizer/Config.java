@@ -1,7 +1,7 @@
 package com.horriblenerd.cobblegenrandomizer;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -95,7 +95,7 @@ public class Config {
     }
 
     private static void addBlock(List<String> list, Block block, int weight) {
-        list.add(String.format("%s%s%d", Objects.requireNonNull(block.getRegistryName()).toString(), SEPARATOR.replaceAll("\\\\", ""), weight));
+        list.add(String.format("%s%s%d", Objects.requireNonNull(block.getRegistryName()), SEPARATOR.replaceAll("\\\\", ""), weight));
     }
 
     private static void addBlock(List<String> list, Block block) {
