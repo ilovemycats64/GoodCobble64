@@ -71,7 +71,7 @@ public class Config {
         COMMON_CONFIG = COMMON_BUILDER.build();
     }
 
-    private static vid initLists() {
+    private static void initLists() {
         addBlock(cobble, Blocks.COBBLESTONE, 30);
         addBlock(cobble, Blocks.COAL_ORE, 25);
         addBlock(cobble, Blocks.IRON_ORE, 20);
@@ -103,13 +103,13 @@ public class Config {
     }
 
 }
-custom_generators = [",
-                     "[\"cobblestone\", \"create:zinc_ore\", [\"create:zinc_ore\"]],", 
-                     "[\"cobblestone\", \"minecraft:iron_ore\", [\minecraft:iron_ore\"]],",
-                     "[\"cobblestone\", \"minecraft:coal_ore\", [\minecraft:coal_ore\"]],",
-                     "[\"cobblestone\", \"minecraft:gold_ore\", [\minecraft:gold_ore\"]],",
-                     "[\"cobblestone\", \"minecraft:lapis_ore\", [\minecraft:lapis_ore\"]],",
-                     "[\"cobblestone\", \"minecraft:diamond_ore\", [\minecraft:diamond_ore\"]],", 
-                     "[\"cobblestone\", \"minecraft:andesite\", [\minecraft:andesite\"]],",
-                     "[\"cobblestone\", \"minecraft:granite\", [\minecraft:granite\"]],",
-                     "[\"cobblestone\", \"minecraft:diorite\", [\minecraft:diorite\"]]]"
+("Custom generators",
+                     "gen: [\"cobblestone\", \"create:zinc_ore\", [\"create:zinc_ore\"]],", 
+                     "gen: [\"cobblestone\", \"minecraft:iron_ore\", [\minecraft:iron_ore\"]],",
+                     "gen: [\"cobblestone\", \"minecraft:coal_ore\", [\minecraft:coal_ore\"]],",
+                     "gen: [\"cobblestone\", \"minecraft:gold_ore\", [\minecraft:gold_ore\"]],",
+                     "gen: [\"cobblestone\", \"minecraft:lapis_ore\", [\minecraft:lapis_ore\"]],",
+                     "gen: [\"cobblestone\", \"minecraft:diamond_ore\", [\minecraft:diamond_ore\"]],", 
+                     "gen: [\"cobblestone\", \"minecraft:andesite\", [\minecraft:andesite\"]],",
+                     "gen: [\"cobblestone\", \"minecraft:granite\", [\minecraft:granite\"]],",
+                     "gen: [\"cobblestone\", \"minecraft:diorite\", [\minecraft:diorite\"]]]")
