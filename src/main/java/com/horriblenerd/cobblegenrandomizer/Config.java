@@ -72,14 +72,15 @@ public class Config {
     }
 
     private static void initLists() {
-        addBlock(cobble, Blocks.COBBLESTONE, 60);
+        addBlock(cobble, Blocks.COBBLESTONE, 30);
         addBlock(cobble, Blocks.COAL_ORE, 25);
         addBlock(cobble, Blocks.IRON_ORE, 20);
-        addBlock(cobble, Blocks.REDSTONE_ORE, 20);
-        addBlock(cobble, Blocks.LAPIS_ORE, 20);
-        addBlock(cobble, Blocks.EMERALD_ORE, 5);
+        addBlock(cobble, Blocks.REDSTONE_ORE, 15);
+        addBlock(cobble, Blocks.LAPIS_ORE, 15);
+        addBlock(cobble, Blocks.EMERALD_ORE, 0);
         addBlock(cobble, Blocks.GOLD_ORE, 10);
         addBlock(cobble, Blocks.DIAMOND_ORE, 5);
+        addBlock(cobble, Blocks.ZINK_ORE, 20);
 
         addBlock(stone, Blocks.STONE, 30);
         addBlock(stone, Blocks.GRANITE, 10);
