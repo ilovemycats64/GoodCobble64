@@ -71,7 +71,7 @@ public class Config {
         COMMON_CONFIG = COMMON_BUILDER.build();
     }
 
-    private static void initLists() {
+    private static vid initLists() {
         addBlock(cobble, Blocks.COBBLESTONE, 30);
         addBlock(cobble, Blocks.COAL_ORE, 25);
         addBlock(cobble, Blocks.IRON_ORE, 20);
@@ -80,7 +80,6 @@ public class Config {
         addBlock(cobble, Blocks.EMERALD_ORE, 0);
         addBlock(cobble, Blocks.GOLD_ORE, 10);
         addBlock(cobble, Blocks.DIAMOND_ORE, 5);
-        addBlock(cobble, Blocks.ZINK_ORE, 20);
 
         addBlock(stone, Blocks.STONE, 30);
         addBlock(stone, Blocks.GRANITE, 10);
@@ -104,3 +103,13 @@ public class Config {
     }
 
 }
+custom_generators = [",
+                     "[\"cobblestone\", \"create:zinc_ore\", [\"create:zinc_ore\"]],", 
+                     "[\"cobblestone\", \"minecraft:iron_ore\", [\minecraft:iron_ore\"]],",
+                     "[\"cobblestone\", \"minecraft:coal_ore\", [\minecraft:coal_ore\"]],",
+                     "[\"cobblestone\", \"minecraft:gold_ore\", [\minecraft:gold_ore\"]],",
+                     "[\"cobblestone\", \"minecraft:lapis_ore\", [\minecraft:lapis_ore\"]],",
+                     "[\"cobblestone\", \"minecraft:diamond_ore\", [\minecraft:diamond_ore\"]],", 
+                     "[\"cobblestone\", \"minecraft:andesite\", [\minecraft:andesite\"]],",
+                     "[\"cobblestone\", \"minecraft:granite\", [\minecraft:granite\"]],",
+                     "[\"cobblestone\", \"minecraft:diorite\", [\minecraft:diorite\"]]]"
